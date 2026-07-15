@@ -60,15 +60,19 @@
 </div>
 
 <div class="card">
-  <h2>Cadastrar grupo de teste</h2>
+  <h2>Cadastrar grupo</h2>
   <label>Nome do grupo</label>
-  <input type="text" id="grupoNome" placeholder="Grupo de Teste" value="Grupo de Teste" />
+  <input type="text" id="grupoNome" placeholder="Corrida SP" />
   <label>Plataforma</label>
   <select id="grupoPlataforma" style="width:100%; padding:9px 11px; border:1px solid #dcdcd7; border-radius:8px; font-size:14px;">
     <option value="whatsapp">WhatsApp</option>
     <option value="telegram">Telegram</option>
   </select>
-  <button onclick="cadastrarGrupo()">Cadastrar grupo (marcado como teste)</button>
+  <label style="display:flex; align-items:center; gap:8px; margin-top:12px;">
+    <input type="checkbox" id="grupoTeste" style="width:auto;" />
+    Este é o grupo de teste (só você participa, recebe tudo automaticamente e NÃO aparece na lista de seleção do painel)
+  </label>
+  <button onclick="cadastrarGrupo()">Cadastrar grupo</button>
   <div class="resultado" id="resultadoGrupo"></div>
 </div>
 
@@ -111,7 +115,7 @@ async function cadastrarGrupo() {
       body: JSON.stringify({
         nome: document.getElementById("grupoNome").value,
         plataforma: document.getElementById("grupoPlataforma").value,
-        e_grupo_teste: true,
+        e_grupo_teste: document.getElementById("grupoTeste").checked,
       }),
     });
     const data = await res.json();
