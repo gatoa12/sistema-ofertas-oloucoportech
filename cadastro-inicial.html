@@ -87,7 +87,7 @@ async function cadastrarLoja() {
   const dominios = document.getElementById("lojaDominios").value.split(",").map(d => d.trim()).filter(Boolean);
 
   try {
-    const res = await fetch("https://sistema-ofertas-oloucoportech.pages.dev/api/lojas", {
+    const res = await fetch("/api/lojas", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${chave}` },
       body: JSON.stringify({
@@ -122,7 +122,7 @@ async function cadastrarGrupo() {
   if (plataforma === "telegram") corpo.telegram_chat_id = idTecnico || null;
 
   try {
-    const res = await fetch("https://sistema-ofertas-oloucoportech.pages.dev/api/grupos", {
+    const res = await fetch("/api/grupos", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${chave}` },
       body: JSON.stringify(corpo),
