@@ -72,6 +72,8 @@
     <input type="checkbox" id="grupoTeste" style="width:auto;" />
     Este é o grupo de teste (só você participa, recebe tudo automaticamente e NÃO aparece na lista de seleção do painel)
   </label>
+  <label>ID técnico do grupo (opcional por enquanto, mas necessário pro robô enviar de verdade)</label>
+  <input type="text" id="grupoIdTecnico" placeholder="WhatsApp: 55119...@g.us  |  Telegram: -1001234567890" />
   <button onclick="cadastrarGrupo()">Cadastrar grupo</button>
   <div class="resultado" id="resultadoGrupo"></div>
 </div>
@@ -108,15 +110,22 @@ async function cadastrarGrupo() {
   const el = document.getElementById("resultadoGrupo");
   if (!chave) { el.innerHTML = '<span class="erro">Preencha a chave de admin primeiro.</span>'; return; }
 
+  const plataforma = document.getElementById("grupoPlataforma").value;
+  const idTecnico = document.getElementById("grupoIdTecnico").value.trim();
+
+  const corpo = {
+    nome: document.getElementById("grupoNome").value,
+    plataforma,
+    e_grupo_teste: document.getElementById("grupoTeste").checked,
+  };
+  if (plataforma === "whatsapp") corpo.whatsapp_id = idTecnico || null;
+  if (plataforma === "telegram") corpo.telegram_chat_id = idTecnico || null;
+
   try {
     const res = await fetch("/api/grupos", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${chave}` },
-      body: JSON.stringify({
-        nome: document.getElementById("grupoNome").value,
-        plataforma: document.getElementById("grupoPlataforma").value,
-        e_grupo_teste: document.getElementById("grupoTeste").checked,
-      }),
+      body: JSON.stringify(corpo),
     });
     const data = await res.json();
     el.innerHTML = data.ok
