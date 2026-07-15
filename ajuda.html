@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ajuda - Sistema de Ofertas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: #f6f6f4;
+    color: #1a1a1a;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: #8a8a85; font-size: 13px; margin-bottom: 20px; }
+  nav { display: flex; gap: 8px; margin-bottom: 22px; }
+  nav a {
+    font-size: 13px; font-weight: 500; text-decoration: none; color: #4a4a45;
+    padding: 8px 14px; border: 1px solid #e2e2de; border-radius: 8px; background: #fff;
+    transition: all 0.15s ease;
+  }
+  nav a:hover { border-color: #c9c9c3; }
+  nav a.ativo { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .card {
+    background: #fff; border: 1px solid #eaeae6; border-radius: 14px;
+    padding: 18px 20px; margin-bottom: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card h2 { font-size: 15px; margin: 0 0 6px; font-weight: 600; }
+  .card p { font-size: 13px; color: #3a3a36; margin: 4px 0; }
+  .pro { color: #1a8a4a; font-size: 13px; }
+  .risco { color: #c0392b; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="admin-ofertas.html">Nova oferta</a>
+  <a href="historico.html">Histórico</a>
+  <a href="ajuda.html" class="ativo">Ajuda</a>
+</nav>
+
+<h1>Como funciona cada parte do painel</h1>
+<div class="sub">Guia rápido de referência</div>
+
+<div class="card">
+  <h2>Foto da oferta</h2>
+  <p>Você pode clicar no campo e escolher um arquivo, ou simplesmente copiar uma imagem (de qualquer lugar) e colar com Ctrl+V na página — ela aparece automaticamente no campo.</p>
+  <p class="pro">✓ Facilita reaproveitar imagens que você já tem, sem precisar salvar o arquivo antes.</p>
+</div>
+
+<div class="card">
+  <h2>Enviar para (Telegram e/ou WhatsApp)</h2>
+  <p>Escolhe pra onde a oferta vai. Os dois ficam marcados por padrão, ou seja, uma única publicação já dispara ao mesmo tempo pro Telegram e pro WhatsApp — isso é o "envio em massa" que você pediu.</p>
+  <p>Se quiser mandar só pra um dos dois, é só desmarcar o outro antes de selecionar os grupos.</p>
+  <p class="pro">✓ Economiza tempo: uma oferta, dois canais, um clique.</p>
+</div>
+
+<div class="card">
+  <h2>Selecionar grupos</h2>
+  <p>Mostra os grupos de Telegram e WhatsApp separadamente, conforme o que você marcou em "Enviar para". Cada grupo mostra quando recebeu a última oferta, pra você não repetir demais no mesmo grupo em pouco tempo.</p>
+  <p class="pro">✓ Você decide exatamente onde cada oferta vai, em vez de mandar pra todo mundo sempre.</p>
+</div>
+
+<div class="card">
+  <h2>Marcar todos (@todos) no grupo</h2>
+  <p>Envia a oferta mencionando todos os participantes do grupo de WhatsApp selecionado, o que gera notificação pra cada pessoa mesmo que o grupo esteja silenciado.</p>
+  <p class="pro">✓ Garante que a oferta chame atenção de verdade — bom pra promoções relâmpago importantes.</p>
+  <p class="risco">⚠ É a função que mais gera denúncia e é um gatilho comum de bloqueio de número se usada toda hora. O sistema mostra quantas vezes cada grupo já recebeu isso na semana antes de você confirmar. Use com moderação — no máximo uma vez por dia por grupo, e só quando a oferta realmente for excelente.</p>
+</div>
+
+<div class="card">
+  <h2>Urgência (Normal / Relâmpago)</h2>
+  <p>Muda a frase automática que acompanha a oferta. "Relâmpago" adiciona algo como "⚡ Essa oferta acaba rápido, compre já!" — "Normal" não adiciona essa frase.</p>
+  <p class="pro">✓ Você não precisa digitar isso toda vez, o sistema monta sozinho.</p>
+</div>
+
+<div class="card">
+  <h2>Agendar vs Publicar agora</h2>
+  <p><strong>Publicar agora:</strong> vai direto pra fila e é enviado assim que o robô processar (poucos segundos).</p>
+  <p><strong>Agendar:</strong> só é enviado no horário exato que você escolher no campo de data/hora. Antes disso, o sistema não faz nada com ela.</p>
+</div>
+
+<div class="card">
+  <h2>Histórico e edição</h2>
+  <p>Fica numa página separada, mostrando todas as ofertas dos últimos 10 horas com o status de entrega em cada canal (site, Telegram, WhatsApp, e as versões de teste). Você pode clicar em "Editar" pra corrigir algo e reenviar, ou "Reenviar agora" pra mandar de novo sem mudar nada.</p>
+  <p class="pro">✓ Se algum canal falhar, você vê exatamente qual e pode reenviar só aquela oferta, sem bagunçar o resto.</p>
+</div>
+
+<div class="card">
+  <h2>Grupo de teste</h2>
+  <p>Toda oferta também é enviada automaticamente pra um grupo/canal que só você participa. Isso serve como prova de que o envio saiu corretamente, sem você precisar abrir os grupos reais pra checar.</p>
+  <p class="pro">✓ Confiança de que a oferta realmente chegou, na hora, sem precisar confiar apenas na tela do painel.</p>
+</div>
+
+<div class="card">
+  <h2>Hashtags automáticas por loja</h2>
+  <p>Cada loja cadastrada (Amazon, Mercado Livre, Shopee...) tem sua hashtag fixa configurada, que entra sozinha no final da mensagem.</p>
+  <p class="pro">✓ Consistência — toda oferta daquela loja sempre carrega a hashtag certa, sem depender de você lembrar.</p>
+</div>
+
+</body>
+</html>

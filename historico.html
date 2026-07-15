@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Histórico de Ofertas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: #f6f6f4;
+    color: #1a1a1a;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: #8a8a85; font-size: 13px; margin-bottom: 20px; }
+  nav { display: flex; gap: 8px; margin-bottom: 22px; }
+  nav a {
+    font-size: 13px; font-weight: 500; text-decoration: none; color: #4a4a45;
+    padding: 8px 14px; border: 1px solid #e2e2de; border-radius: 8px; background: #fff;
+    transition: all 0.15s ease;
+  }
+  nav a:hover { border-color: #c9c9c3; }
+  nav a.ativo { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .item {
+    background: #fff; border: 1px solid #eaeae6; border-radius: 14px;
+    padding: 16px 18px; margin-bottom: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .item-topo { display: flex; gap: 12px; }
+  .item-topo img { width: 56px; height: 56px; object-fit: cover; border-radius: 8px; flex-shrink: 0; }
+  .item-titulo { font-weight: 600; font-size: 14px; }
+  .item-meta { font-size: 12px; color: #9a9a92; margin-top: 2px; }
+  .status-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px;
+    font-size: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f0f0ec;
+  }
+  .status-linha { display: flex; justify-content: space-between; }
+  .ok { color: #1a8a4a; } .falha { color: #c0392b; } .pendente { color: #b0b0a8; }
+  .acoes { display: flex; gap: 8px; margin-top: 12px; }
+  .acoes button, .acoes a {
+    font-size: 12px; font-weight: 500; padding: 7px 14px; border-radius: 8px; border: 1px solid #dcdcd7;
+    background: #fff; cursor: pointer; text-decoration: none; color: #1a1a1a; transition: border-color 0.15s ease;
+  }
+  .acoes button:hover, .acoes a:hover { border-color: #b5b5ad; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="admin-ofertas.html">Nova oferta</a>
+  <a href="historico.html" class="ativo">Histórico</a>
+  <a href="ajuda.html">Ajuda</a>
+</nav>
+
+<h1>Histórico de ofertas</h1>
+<div class="sub">Some automaticamente 10 horas após a criação</div>
+
+<div id="lista">Carregando...</div>
+
+<script>
+const API_BASE = "";
+const ADMIN_KEY = new URLSearchParams(window.location.search).get("chave") || localStorage.getItem("chave_admin") || "";
+
+const nomesCanais = {
+  site: "Site",
+  telegram_real: "Telegram",
+  telegram_teste: "Telegram (teste)",
+  whatsapp_grupos: "WhatsApp",
+  whatsapp_teste: "WhatsApp (teste)",
+};
+
+function classeStatus(valor) {
+  if (valor === "confirmado") return "ok";
+  if (valor === "falhou") return "falha";
+  return "pendente";
+}
+
+function iconeStatus(valor) {
+  if (valor === "confirmado") return "✅";
+  if (valor === "falhou") return "❌";
+  return "…";
+}
+
+async function carregar() {
+  const [resOfertas, resLojas] = await Promise.all([
+    fetch(`${API_BASE}/api/ofertas`, { headers: { Authorization: `Bearer ${ADMIN_KEY}` } }),
+    fetch(`${API_BASE}/api/lojas`, { headers: { Authorization: `Bearer ${ADMIN_KEY}` } }),
+  ]);
+  const { ofertas } = await resOfertas.json();
+  const { lojas } = await resLojas.json();
+
+  const ordenadas = (ofertas || []).sort((a, b) => new Date(b.criado_em) - new Date(a.criado_em));
+
+  if (ordenadas.length === 0) {
+    document.getElementById("lista").innerHTML = "<p style='font-size:13px;color:#888;'>Nenhuma oferta nas últimas 10 horas.</p>";
+    return;
+  }
+
+  const htmlItens = await Promise.all(ordenadas.map(async (o) => {
+    const loja = (lojas || []).find(l => l.id === o.loja);
+    let log = null;
+    try {
+      const resLog = await fetch(`${API_BASE}/api/status/${o.id}`, { headers: { Authorization: `Bearer ${ADMIN_KEY}` } });
+      if (resLog.ok) log = await resLog.json();
+    } catch (e) {}
+
+    const statusHtml = log
+      ? Object.entries(nomesCanais).map(([chave, nome]) => `
+          <div class="status-linha">
+            <span>${nome}</span>
+            <span class="${classeStatus(log[chave])}">${iconeStatus(log[chave])}</span>
+          </div>`).join("")
+      : "";
+
+    return `
+      <div class="item">
+        <div class="item-topo">
+          ${o.imagem ? `<img src="${o.imagem}" />` : ""}
+          <div>
+            <div class="item-titulo">${o.titulo}</div>
+            <div class="item-meta">${loja?.nome || o.loja} &middot; ${o.status} &middot; ${new Date(o.criado_em).toLocaleString("pt-BR")}</div>
+          </div>
+        </div>
+        <div class="status-grid">${statusHtml}</div>
+        <div class="acoes">
+          <a href="admin-ofertas.html?editar=${o.id}&chave=${ADMIN_KEY}">Editar</a>
+          <button onclick="reenviar('${o.id}', this)">Reenviar agora</button>
+        </div>
+      </div>`;
+  }));
+
+  document.getElementById("lista").innerHTML = htmlItens.join("");
+}
+
+async function reenviar(id, botao) {
+  botao.textContent = "Reenviando...";
+  botao.disabled = true;
+  await fetch(`${API_BASE}/api/ofertas/${id}/publicar`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${ADMIN_KEY}` },
+  });
+  setTimeout(carregar, 1500);
+}
+
+carregar();
+</script>
+</body>
+</html>

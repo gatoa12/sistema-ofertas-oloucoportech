@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Painel de Ofertas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    background: #f6f6f4;
+    color: #1a1a1a;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 24px 20px 60px;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1 { font-size: 22px; margin: 0 0 4px; font-weight: 700; letter-spacing: -0.01em; }
+  .sub { color: #8a8a85; font-size: 13px; margin-bottom: 20px; }
+  nav { display: flex; gap: 8px; margin-bottom: 22px; }
+  nav a {
+    font-size: 13px; font-weight: 500; text-decoration: none; color: #4a4a45;
+    padding: 8px 14px; border: 1px solid #e2e2de; border-radius: 8px; background: #fff;
+    transition: all 0.15s ease;
+  }
+  nav a:hover { border-color: #c9c9c3; }
+  nav a.ativo { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+  .card {
+    background: #fff;
+    border: 1px solid #eaeae6;
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  }
+  .card h2 { font-size: 15px; margin: 0 0 4px; font-weight: 600; }
+  .card > p:first-of-type { margin-top: 0; }
+  label { display: block; font-size: 12px; font-weight: 500; color: #6a6a65; margin: 12px 0 5px; }
+  input[type=text], input[type=datetime-local], select, textarea {
+    width: 100%; padding: 9px 11px; border: 1px solid #dcdcd7; border-radius: 8px;
+    font-size: 14px; font-family: inherit; background: #fdfdfc; transition: border-color 0.15s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: #9a9a92; background: #fff;
+  }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .urgencia-btns, .destino-btns { display: flex; gap: 8px; margin-top: 6px; }
+  .urgencia-btns button, .destino-btns button {
+    flex: 1; padding: 9px; border-radius: 8px; border: 1px solid #dcdcd7;
+    background: #fff; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s ease;
+  }
+  .urgencia-btns button:hover, .destino-btns button:hover { border-color: #b5b5ad; }
+  .urgencia-btns button.ativo { background: #c65a2e; color: #fff; border-color: #c65a2e; }
+  .destino-btns button.ativo { background: #2a6f97; color: #fff; border-color: #2a6f97; }
+  .grupo-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 12px; border: 1px solid #eaeae6; border-radius: 8px; margin-bottom: 6px;
+    font-size: 13px; background: #fdfdfc;
+  }
+  .grupo-item.pausado { opacity: 0.5; }
+  .grupo-status { font-size: 11px; color: #9a9a92; }
+  .grupo-plataforma-titulo { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: #b0b0a8; margin: 14px 0 6px; }
+  .btn { padding: 10px 18px; border-radius: 8px; border: 1px solid #dcdcd7; background: #fff; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s ease; }
+  .btn:hover { border-color: #b5b5ad; }
+  .btn-primary { background: #1a1a1a; color: #fff; border: none; }
+  .btn-primary:hover { background: #333; }
+  .btn-row { display: flex; gap: 10px; margin-top: 14px; }
+  .aviso {
+    background: #fdf3e7; border: 1px solid #ecc98f; color: #8a5a1a;
+    font-size: 12px; padding: 10px 12px; border-radius: 8px; margin-top: 10px; display:none; line-height: 1.5;
+  }
+  .area-imagem {
+    border: 1.5px dashed #d5d5cf; border-radius: 10px; padding: 20px; text-align: center;
+    font-size: 13px; color: #9a9a92; cursor: pointer; position: relative; transition: border-color 0.15s ease;
+  }
+  .area-imagem:hover { border-color: #b0b0a8; }
+  .area-imagem.tem-imagem { border-style: solid; padding: 8px; }
+  .area-imagem img { max-width: 100%; max-height: 160px; border-radius: 8px; display: block; margin: 0 auto; }
+  .area-imagem input[type=file] { display: none; }
+  .remover-imagem {
+    position: absolute; top: 8px; right: 8px; background: #fff; border: 1px solid #dcdcd7;
+    border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 12px;
+  }
+  #msg { font-size: 13px; margin-top: 10px; color: #4a4a45; }
+  .banner-edicao {
+    background: #eaf2fa; border: 1px solid #a9cbe8; color: #1a5a8a;
+    font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="admin-ofertas.html" class="ativo">Nova oferta</a>
+  <a href="historico.html">Histórico</a>
+  <a href="ajuda.html">Ajuda</a>
+</nav>
+
+<h1>Painel de ofertas</h1>
+<div class="sub">Histórico some automaticamente após 10h</div>
+
+<div id="bannerEdicao" class="banner-edicao" style="display:none;">
+  Editando uma oferta existente. Ao salvar, ela será reenviada com os dados atualizados.
+</div>
+
+<div class="card">
+  <h2>Colar oferta</h2>
+  <p style="font-size:12px; color:#888; margin: 0 0 8px;">Copie o texto de uma oferta (de outro canal, site, onde for) e cole aqui. O sistema tenta preencher os campos abaixo sozinho.</p>
+  <textarea id="textoColado" rows="4" placeholder="Cole aqui o texto da oferta..." style="width:100%; padding:8px 10px; border:1px solid #ccc; border-radius:6px; font-size:13px;"></textarea>
+  <button type="button" class="btn" style="margin-top:8px;" onclick="preencherAutomaticamente()">Preencher automaticamente ↓</button>
+</div>
+
+<div class="card">
+  <h2>Nova oferta</h2>
+  <label>Título</label>
+  <input type="text" id="titulo" placeholder="Tênis Corrida Nike Pegasus - 40% OFF" />
+
+  <div class="row2">
+    <div>
+      <label>Loja</label>
+      <select id="loja"></select>
+    </div>
+    <div>
+      <label>Preço</label>
+      <input type="text" id="preco" placeholder="R$ 249,90" />
+    </div>
+  </div>
+
+  <label>Cupom</label>
+  <input type="text" id="cupom" placeholder="CORRE40" />
+
+  <label>Link de afiliado</label>
+  <input type="text" id="link" placeholder="https://..." />
+
+  <label>Foto da oferta (cole com Ctrl+V ou clique para enviar um arquivo)</label>
+  <div class="area-imagem" id="areaImagem" onclick="document.getElementById('arquivoImagem').click()">
+    <span id="textoAreaImagem">Clique aqui, ou copie uma imagem e cole (Ctrl+V) em qualquer lugar da página</span>
+    <img id="previewImagem" style="display:none;" />
+    <button type="button" class="remover-imagem" id="btnRemoverImagem" style="display:none;" onclick="removerImagem(event)">✕</button>
+    <input type="file" id="arquivoImagem" accept="image/*" onchange="lidarComArquivo(event.target.files[0])" />
+  </div>
+
+  <label>Urgência</label>
+  <div class="urgencia-btns">
+    <button type="button" data-val="normal" class="ativo" onclick="setUrgencia('normal', this)">Normal</button>
+    <button type="button" data-val="relampago" onclick="setUrgencia('relampago', this)">Relâmpago</button>
+  </div>
+
+  <label>Enviar para (envio em massa)</label>
+  <div class="destino-btns">
+    <button type="button" data-val="telegram" class="ativo" onclick="alternarDestino('telegram', this)">Telegram</button>
+    <button type="button" data-val="whatsapp" class="ativo" onclick="alternarDestino('whatsapp', this)">WhatsApp</button>
+  </div>
+</div>
+
+<div class="card">
+  <h2>Selecionar grupos</h2>
+  <div id="listaGrupos"></div>
+
+  <label style="margin-top:14px; display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" id="marcarTodos" style="width:auto;" onchange="checarAvisoMarcarTodos()" />
+    Marcar todos (@todos) nos grupos de WhatsApp selecionados
+  </label>
+  <div class="aviso" id="avisoMarcarTodos"></div>
+</div>
+
+<div class="card">
+  <h2>Agendamento e envio</h2>
+  <label>Agendar para (deixe vazio para enviar normal)</label>
+  <input type="datetime-local" id="agendarPara" />
+  <div class="btn-row">
+    <button class="btn" onclick="salvarOferta(true)">Agendar</button>
+    <button class="btn btn-primary" id="btnPublicar" onclick="salvarOferta(false)">Publicar agora</button>
+  </div>
+  <div id="msg"></div>
+</div>
+
+<script>
+const API_BASE = "";
+const params = new URLSearchParams(window.location.search);
+const ADMIN_KEY = params.get("chave") || localStorage.getItem("chave_admin") || "";
+if (params.get("chave")) localStorage.setItem("chave_admin", params.get("chave"));
+
+const idEdicao = params.get("editar");
+
+let urgenciaAtual = "normal";
+let destinosAtivos = new Set(["telegram", "whatsapp"]);
+let gruposCache = [];
+let imagemBase64 = null;
+
+function setUrgencia(val, btn) {
+  urgenciaAtual = val;
+  document.querySelectorAll(".urgencia-btns button").forEach(b => b.classList.remove("ativo"));
+  btn.classList.add("ativo");
+}
+
+function alternarDestino(val, btn) {
+  if (destinosAtivos.has(val)) {
+    destinosAtivos.delete(val);
+    btn.classList.remove("ativo");
+  } else {
+    destinosAtivos.add(val);
+    btn.classList.add("ativo");
+  }
+  carregarGrupos();
+}
+
+function lidarComArquivo(arquivo) {
+  if (!arquivo) return;
+  const leitor = new FileReader();
+  leitor.onload = (e) => mostrarImagem(e.target.result);
+  leitor.readAsDataURL(arquivo);
+}
+
+function mostrarImagem(base64) {
+  imagemBase64 = base64;
+  const area = document.getElementById("areaImagem");
+  const preview = document.getElementById("previewImagem");
+  document.getElementById("textoAreaImagem").style.display = "none";
+  preview.src = base64;
+  preview.style.display = "block";
+  document.getElementById("btnRemoverImagem").style.display = "block";
+  area.classList.add("tem-imagem");
+}
+
+function removerImagem(ev) {
+  ev.stopPropagation();
+  imagemBase64 = null;
+  document.getElementById("previewImagem").style.display = "none";
+  document.getElementById("btnRemoverImagem").style.display = "none";
+  document.getElementById("textoAreaImagem").style.display = "block";
+  document.getElementById("areaImagem").classList.remove("tem-imagem");
+}
+
+// permite colar (Ctrl+V) uma imagem em qualquer lugar da página
+document.addEventListener("paste", (e) => {
+  const itens = e.clipboardData?.items || [];
+  for (const item of itens) {
+    if (item.type.startsWith("image/")) {
+      const arquivo = item.getAsFile();
+      lidarComArquivo(arquivo);
+    }
+  }
+});
+
+function extrairDadosOferta(texto) {
+  const resultado = { titulo: null, preco: null, cupom: null, link: null, lojaId: null };
+
+  // link: primeira URL encontrada
+  const matchLink = texto.match(/https?:\/\/\S+/);
+  if (matchLink) resultado.link = matchLink[0].replace(/[.,;)\]]+$/, "");
+
+  // preço: formato R$ 123,45 ou R$123
+  const matchPreco = texto.match(/R\$\s?[\d.]+,\d{2}|R\$\s?\d+/);
+  if (matchPreco) resultado.preco = matchPreco[0].replace(/R\$\s?/, "R$ ");
+
+  // cupom: prioriza "Cupom: CODE", senão tenta achar um token isolado perto da palavra cupom/code
+  const matchCupomExplicito = texto.match(/cupom[:\s]+([A-Z0-9]{3,15})/i);
+  if (matchCupomExplicito) {
+    resultado.cupom = matchCupomExplicito[1].toUpperCase();
+  } else {
+    const linhaComCupom = texto.split("\n").find(l => /cupom|code|desconto extra/i.test(l));
+    if (linhaComCupom) {
+      const token = linhaComCupom.match(/\b[A-Z0-9]{4,15}\b/);
+      if (token) resultado.cupom = token[0];
+    }
+  }
+
+  // título: primeira linha não vazia que não seja a linha do preço, cupom ou link
+  const linhas = texto.split("\n").map(l => l.trim()).filter(Boolean);
+  resultado.titulo = linhas.find(l =>
+    l !== resultado.preco &&
+    !l.includes("http") &&
+    !/^cupom/i.test(l)
+  ) || linhas[0] || null;
+
+  // loja: detecta pelo domínio do link, usando a lista de domínios cadastrados em cada loja
+  if (resultado.link) {
+    const lojaEncontrada = lojasCache.find(l =>
+      (l.dominios || []).some(dominio => resultado.link.includes(dominio))
+    );
+    if (lojaEncontrada) resultado.lojaId = lojaEncontrada.id;
+  }
+
+  return resultado;
+}
+
+function preencherAutomaticamente() {
+  const texto = document.getElementById("textoColado").value;
+  if (!texto.trim()) return;
+
+  const dados = extrairDadosOferta(texto);
+
+  if (dados.titulo) document.getElementById("titulo").value = dados.titulo;
+  if (dados.preco) document.getElementById("preco").value = dados.preco;
+  if (dados.cupom) document.getElementById("cupom").value = dados.cupom;
+  if (dados.link) document.getElementById("link").value = dados.link;
+  if (dados.lojaId) document.getElementById("loja").value = dados.lojaId;
+
+  let avisoCampos = [];
+  if (!dados.link) avisoCampos.push("link");
+  if (!dados.cupom) avisoCampos.push("cupom");
+  if (!dados.lojaId) avisoCampos.push("loja");
+
+  document.getElementById("msg").textContent = avisoCampos.length
+    ? `Preenchido. Confira manualmente: ${avisoCampos.join(", ")}.`
+    : "Preenchido automaticamente. Confira antes de publicar.";
+}
+
+let lojasCache = [];
+
+async function carregarLojas() {
+  const res = await fetch(`${API_BASE}/api/lojas`, {
+    headers: { Authorization: `Bearer ${ADMIN_KEY}` }
+  });
+  const data = await res.json();
+  lojasCache = data.lojas || [];
+  const select = document.getElementById("loja");
+  select.innerHTML = lojasCache.map(l => `<option value="${l.id}">${l.nome}</option>`).join("");
+}
+
+async function carregarGrupos() {
+  const res = await fetch(`${API_BASE}/api/grupos`, {
+    headers: { Authorization: `Bearer ${ADMIN_KEY}` }
+  });
+  const data = await res.json();
+  gruposCache = data.grupos || [];
+  const container = document.getElementById("listaGrupos");
+
+  const plataformasVisiveis = [...destinosAtivos];
+  const gruposVisiveis = gruposCache.filter(g => plataformasVisiveis.includes(g.plataforma) && !g.e_grupo_teste);
+
+  const porPlataforma = (plataforma) => gruposVisiveis
+    .filter(g => g.plataforma === plataforma)
+    .map(g => {
+      const pausadoClasse = g.status === "pausado" ? "pausado" : "";
+      const disabled = g.status === "pausado" ? "disabled" : "";
+      const statusTexto = g.status === "pausado"
+        ? "pausado"
+        : (g.ultimo_envio ? "enviado " + tempoRelativo(g.ultimo_envio) : "nunca enviado");
+      return `
+        <div class="grupo-item ${pausadoClasse}">
+          <span><input type="checkbox" class="chk-grupo" value="${g.id}" ${disabled} style="margin-right:8px;" />${g.nome}</span>
+          <span class="grupo-status">${statusTexto}</span>
+        </div>`;
+    }).join("");
+
+  let html = "";
+  if (plataformasVisiveis.includes("telegram")) {
+    html += `<div class="grupo-plataforma-titulo">Telegram</div>${porPlataforma("telegram") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
+  }
+  if (plataformasVisiveis.includes("whatsapp")) {
+    html += `<div class="grupo-plataforma-titulo">WhatsApp</div>${porPlataforma("whatsapp") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
+  }
+  container.innerHTML = html;
+}
+
+function tempoRelativo(isoString) {
+  const diffMs = Date.now() - new Date(isoString).getTime();
+  const horas = Math.floor(diffMs / 3600000);
+  if (horas < 1) return "há poucos minutos";
+  if (horas < 24) return `há ${horas}h`;
+  return `há ${Math.floor(horas / 24)} dia(s)`;
+}
+
+async function checarAvisoMarcarTodos() {
+  const checkbox = document.getElementById("marcarTodos");
+  const aviso = document.getElementById("avisoMarcarTodos");
+  if (!checkbox.checked) { aviso.style.display = "none"; return; }
+
+  const gruposSelecionados = [...document.querySelectorAll(".chk-grupo:checked")]
+    .map(c => c.value)
+    .filter(id => gruposCache.find(g => g.id === id)?.plataforma === "whatsapp");
+
+  if (gruposSelecionados.length === 0) {
+    aviso.style.display = "block";
+    aviso.textContent = "Selecione ao menos um grupo de WhatsApp antes de marcar todos.";
+    return;
+  }
+
+  let avisos = [];
+  for (const id of gruposSelecionados) {
+    const res = await fetch(`${API_BASE}/api/grupos/${id}/marcar-todos-uso`, {
+      headers: { Authorization: `Bearer ${ADMIN_KEY}` }
+    });
+    const registro = await res.json();
+    const grupo = gruposCache.find(g => g.id === id);
+    avisos.push(`${grupo?.nome || id}: usado ${registro.usos_essa_semana}x essa semana`);
+  }
+
+  aviso.style.display = "block";
+  aviso.innerHTML = "⚠️ Atenção — uso excessivo pode gerar denúncias e bloqueio do número.<br>" + avisos.join(" &middot; ");
+}
+
+async function salvarOferta(agendando) {
+  const gruposSelecionados = [...document.querySelectorAll(".chk-grupo:checked")].map(c => c.value);
+  const agendarPara = document.getElementById("agendarPara").value;
+
+  if (agendando && !agendarPara) {
+    document.getElementById("msg").textContent = "Preencha a data/hora para agendar.";
+    return;
+  }
+  if (gruposSelecionados.length === 0) {
+    document.getElementById("msg").textContent = "Selecione ao menos um grupo.";
+    return;
+  }
+
+  const body = {
+    titulo: document.getElementById("titulo").value,
+    loja: document.getElementById("loja").value,
+    preco: document.getElementById("preco").value,
+    cupom: document.getElementById("cupom").value,
+    link_afiliado: document.getElementById("link").value,
+    imagem: imagemBase64,
+    urgencia: urgenciaAtual,
+    destinos: [...destinosAtivos],
+    grupos_selecionados: gruposSelecionados,
+    marcar_todos: document.getElementById("marcarTodos").checked,
+    agendado_para: agendando ? new Date(agendarPara).toISOString() : null,
+    origem: "manual",
+  };
+
+  let res;
+  if (idEdicao) {
+    res = await fetch(`${API_BASE}/api/ofertas/${idEdicao}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_KEY}` },
+      body: JSON.stringify({ ...body, reenviar: !agendando }),
+    });
+  } else {
+    res = await fetch(`${API_BASE}/api/ofertas`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${ADMIN_KEY}` },
+      body: JSON.stringify(body),
+    });
+  }
+
+  const data = await res.json();
+  document.getElementById("msg").textContent = data.ok
+    ? (agendando ? "Oferta agendada com sucesso." : "Oferta publicada, aguardando confirmação de entrega.")
+    : "Erro ao salvar oferta.";
+
+  if (data.ok) {
+    const id = data.oferta?.id || idEdicao;
+    if (id) monitorarEntrega(id);
+  }
+}
+
+async function monitorarEntrega(id) {
+  const tentativas = 15;
+  for (let i = 0; i < tentativas; i++) {
+    await new Promise(r => setTimeout(r, 4000));
+    const res = await fetch(`${API_BASE}/api/status/${id}`, {
+      headers: { Authorization: `Bearer ${ADMIN_KEY}` }
+    });
+    if (!res.ok) continue;
+    const log = await res.json();
+    const canais = ["site", "telegram_real", "telegram_teste", "whatsapp_grupos", "whatsapp_teste"];
+    const todosConfirmados = canais.every(c => log[c] === "confirmado");
+    const algumFalhou = canais.some(c => log[c] === "falhou");
+
+    if (todosConfirmados) {
+      document.getElementById("msg").innerHTML = `✅ Oferta confirmada em todos os canais.`;
+      return;
+    }
+    if (algumFalhou) {
+      document.getElementById("msg").innerHTML = `⚠️ Falha em algum canal: ${log.falhas.map(f => f.canal).join(", ")}`;
+      return;
+    }
+  }
+}
+
+async function carregarOfertaParaEdicao() {
+  if (!idEdicao) return;
+  document.getElementById("bannerEdicao").style.display = "block";
+  document.getElementById("btnPublicar").textContent = "Salvar e reenviar";
+
+  const res = await fetch(`${API_BASE}/api/ofertas`, {
+    headers: { Authorization: `Bearer ${ADMIN_KEY}` }
+  });
+  const data = await res.json();
+  const oferta = (data.ofertas || []).find(o => o.id === idEdicao);
+  if (!oferta) return;
+
+  document.getElementById("titulo").value = oferta.titulo || "";
+  document.getElementById("preco").value = oferta.preco || "";
+  document.getElementById("cupom").value = oferta.cupom || "";
+  document.getElementById("link").value = oferta.link_afiliado || "";
+  if (oferta.imagem) mostrarImagem(oferta.imagem);
+
+  setTimeout(() => {
+    document.getElementById("loja").value = oferta.loja;
+  }, 300);
+
+  destinosAtivos = new Set(oferta.destinos || ["telegram", "whatsapp"]);
+  document.querySelectorAll(".destino-btns button").forEach(b => {
+    b.classList.toggle("ativo", destinosAtivos.has(b.dataset.val));
+  });
+
+  const btnUrgencia = [...document.querySelectorAll(".urgencia-btns button")]
+    .find(b => b.dataset.val === oferta.urgencia);
+  if (btnUrgencia) setUrgencia(oferta.urgencia, btnUrgencia);
+
+  setTimeout(() => {
+    (oferta.grupos_selecionados || []).forEach(id => {
+      const chk = document.querySelector(`.chk-grupo[value="${id}"]`);
+      if (chk) chk.checked = true;
+    });
+  }, 300);
+}
+
+carregarLojas();
+carregarGrupos().then(carregarOfertaParaEdicao);
+</script>
+</body>
+</html>
