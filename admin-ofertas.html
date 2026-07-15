@@ -60,8 +60,11 @@
     font-size: 13px; background: #fdfdfc;
   }
   .grupo-item.pausado { opacity: 0.5; }
-  .grupo-status { font-size: 11px; color: #9a9a92; }
-  .grupo-plataforma-titulo { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: #b0b0a8; margin: 14px 0 6px; }
+  .grupo-status { font-size: 11px; color: #9a9a92; display: flex; align-items: center; gap: 5px; }
+  .bolinha-status { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+  .bolinha-status.ativo { background: #2f9e5b; }
+  .bolinha-status.pausado { background: #c0392b; }
+  .grupo-plataforma-titulo { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; color: #b0b0a8; margin: 14px 0 6px; display: flex; justify-content: space-between; }
   .btn { padding: 10px 18px; border-radius: 8px; border: 1px solid #dcdcd7; background: #fff; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.15s ease; }
   .btn:hover { border-color: #b5b5ad; }
   .btn-primary { background: #1a1a1a; color: #fff; border: none; }
@@ -337,22 +340,25 @@ async function carregarGrupos() {
     .map(g => {
       const pausadoClasse = g.status === "pausado" ? "pausado" : "";
       const disabled = g.status === "pausado" ? "disabled" : "";
+      const bolinhaClasse = g.status === "pausado" ? "pausado" : "ativo";
       const statusTexto = g.status === "pausado"
         ? "pausado"
         : (g.ultimo_envio ? "enviado " + tempoRelativo(g.ultimo_envio) : "nunca enviado");
       return `
         <div class="grupo-item ${pausadoClasse}">
           <span><input type="checkbox" class="chk-grupo" value="${g.id}" ${disabled} style="margin-right:8px;" />${g.nome}</span>
-          <span class="grupo-status">${statusTexto}</span>
+          <span class="grupo-status"><span class="bolinha-status ${bolinhaClasse}"></span>${statusTexto}</span>
         </div>`;
     }).join("");
 
+  const contarAtivos = (plataforma) => gruposVisiveis.filter(g => g.plataforma === plataforma && g.status !== "pausado").length;
+
   let html = "";
   if (plataformasVisiveis.includes("telegram")) {
-    html += `<div class="grupo-plataforma-titulo">Telegram</div>${porPlataforma("telegram") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
+    html += `<div class="grupo-plataforma-titulo"><span>Telegram</span><span>${contarAtivos("telegram")} ativo(s)</span></div>${porPlataforma("telegram") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
   }
   if (plataformasVisiveis.includes("whatsapp")) {
-    html += `<div class="grupo-plataforma-titulo">WhatsApp</div>${porPlataforma("whatsapp") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
+    html += `<div class="grupo-plataforma-titulo"><span>WhatsApp</span><span>${contarAtivos("whatsapp")} ativo(s)</span></div>${porPlataforma("whatsapp") || "<div style='font-size:12px;color:#999;'>Nenhum grupo cadastrado.</div>"}`;
   }
   container.innerHTML = html;
 }
