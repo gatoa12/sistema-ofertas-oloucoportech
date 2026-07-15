@@ -9,10 +9,16 @@
 
 const TTL_HISTORICO_SEGUNDOS = 36000; // 10 horas
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
 function jsonResponse(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...CORS_HEADERS },
   });
 }
 
@@ -21,6 +27,10 @@ async function handleOfertasRoutes(request, env, url) {
   const method = request.method;
 
   if (!path.startsWith("/api/")) return null; // não é rota da API, deixa passar pros arquivos estáticos
+
+  if (method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }
 
   const isRotaDoRobo = path.startsWith("/api/fila") || path.startsWith("/api/status");
 
