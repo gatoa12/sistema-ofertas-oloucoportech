@@ -26,13 +26,6 @@ async function handleOfertasRoutes(request, env, url) {
   const path = url.pathname;
   const method = request.method;
 
-  if (path === "/api/debug-temporario" && method === "GET") {
-    return jsonResponse({
-      BOT_API_KEY_no_servidor: env.BOT_API_KEY || "(vazio/não definida)",
-      ADMIN_WRITE_KEY_no_servidor: env.ADMIN_WRITE_KEY || "(vazio/não definida)",
-    });
-  }
-
   if (!path.startsWith("/api/")) return null; // não é rota da API, deixa passar pros arquivos estáticos
 
   if (method === "OPTIONS") {
